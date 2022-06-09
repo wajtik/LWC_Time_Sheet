@@ -1,0 +1,152 @@
+<template>
+    <lightning-card variant="Narrow" title={title} icon-name="custom:custom3" >        
+
+        <div class="overtime">
+            Overtime: {overtime} hours
+        </div>
+
+        <div style="display: flex; margin: 10px;">
+            <div style="margin: 10px;">
+                <lightning-combobox
+                    name="yearPicker"
+                    value={startYear}
+                    placeholder={chosenYear}
+                    options={years}
+                    onchange={handleYearChange} >
+                </lightning-combobox>
+            </div>
+
+            <div style="margin: 10px;">
+                <lightning-combobox
+                    name="monthPicker"
+                    value={startMonth}
+                    placeholder={chosenMonth}
+                    options={months}
+                    onchange={handleMonthChange} >
+                </lightning-combobox>
+            </div>
+        </div>
+
+        <template if:false={tableRowsFilled}>
+            <div class="main-msg">There is no timesheet created for this period yet.</div>
+        </template>
+
+        <div class="slds-scrollable_x" style="height:100%;width:100%">
+            <div class="slds-text-longform" style="width:150%">
+
+                <template if:true={tableRowsFilled}>
+            
+                    <div class="button-div">
+                        <lightning-button variant="brand" label="Save" title="Save" onclick={handleSave} class="save-button"></lightning-button><br/>
+                    </div>
+
+                    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols">
+                        <thead class="thead">
+                            <tr class="slds-line-height_reset"> 
+                                <th colspan={columnsSize}></th>     
+                                <th colspan={easiEligibleSize} scope="colgroup" class="slds-text-align_center table-header table-header-middle">EaSi Eligible</th>
+                                <th colspan={easiIneligibleSize} scope="colgroup" class="slds-text-align_center table-header table-header-middle">EaSi Ineligible</th>
+                                <th colspan=2></th>   
+                            </tr>
+                            <tr class="slds-line-height_reset">   
+                                <template for:each={columns} for:item="column">              
+                                    <th class="slds-text-align_center table-header" scope="col" key={column}> 
+                                        <div class="slds-truncate" title={column}>{column}</div>
+                                    </th>
+                                </template>
+                                <th class="slds-text-align_center table-header" scope="col">Day</th> 
+                                <th class="slds-text-align_center table-header" scope="col">Date</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={tableRows} for:item="tr">
+                                <tr key={tr.timesheetId} class="table-row">
+                                    <td class="table-data" scope="col">
+                                        <div class="output-div">{tr.dayOfWeek}</div>
+                                    </td>
+                                    <td class="table-data" scope="col">
+                                        <div class="output-div">{tr.dayDate}</div>
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="input-div">                         
+                                            <lightning-input class="input" type="time" value={tr.timeIn} onchange={handleChange} label="timeIn" name={tr.timesheetId} disabled={tr.isDayOffOrToil} variant="label-hidden"></lightning-input>
+                                        </div>
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="input-div">
+                                            <lightning-input class="input" type="time" value={tr.timeOut} onchange={handleChange} label="timeOut"  name={tr.timesheetId} disabled={tr.isDayOffOrToil} variant="label-hidden"></lightning-input>
+                                        </div>   
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="input-div">
+                                            <lightning-input class="input" type="number" value={tr.lunchBreak} onchange={handleChange} label="lunchBreak" name={tr.timesheetId} disabled={tr.isDayOffOrToil} step="0.01" variant="label-hidden"></lightning-input>
+                                        </div> 
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="input-div input-comment-div"> 
+                                            <lightning-input class="input" type="text" value={tr.comment} onchange={handleChange} label="comment"  name={tr.timesheetId} disabled={tr.isDayOffOrToil} variant="label-hidden"></lightning-input>
+                                        </div> 
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="output-div">{tr.total}</div>
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="output-div">{tr.officialWorkHours}</div>
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="output-div">{tr.overtime}</div>
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="input-div">   
+                                            <lightning-input class="input" type="checkbox" value={tr.dayoff} onchange={handleChange} label="dayoff" checked={tr.dayoff} name={tr.timesheetId} disabled={tr.isWeekend} variant="label-hidden"></lightning-input>
+                                        </div> 
+                                    </td>
+                                    <td scope="col" class="table-data">
+                                        <div class="input-div"> 
+                                            <lightning-input class="input" type="checkbox" value={tr.toil} onchange={handleChange} label="toil" checked={tr.toil} name={tr.timesheetId} disabled={tr.isWeekend} variant="label-hidden"></lightning-input>
+                                        </div> 
+                                    </td>
+                                    <template for:each={tr.entryList} for:item="entry">
+                                        <td class="table-data" scope="col" key={entry.entryConcatenatedId}> 
+                                            <div class="input-div"> 
+                                                <lightning-input class="input" type="number" value={entry.hours} onchange={handleChange} label="entryhours" name={entry.concatenatedId} disabled={tr.isDayOffOrToil} step="0.01" variant="label-hidden"></lightning-input>
+                                            </div> 
+                                        </td>
+                                    </template>
+                                    <td class="table-data" scope="col">
+                                        <div class="output-div">{tr.dayOfWeek}</div>
+                                    </td>
+                                    <td class="table-data" scope="col">
+                                        <div class="output-div">{tr.dayDate}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                        <thead class="thead">
+                            <tr class="slds-line-height_reset">   
+                                <template for:each={columns} for:item="column">              
+                                    <th class="slds-text-align_center table-header" scope="col" key={column}> 
+                                        <div class="slds-truncate" title={column}>{column}</div>
+                                    </th>
+                                </template>
+                                <th class="slds-text-align_center table-header" scope="col">Day</th> 
+                                <th class="slds-text-align_center table-header" scope="col">Date</th> 
+                            </tr>
+                            <tr class="slds-line-height_reset"> 
+                                <th colspan={columnsSize}></th>     
+                                <th colspan={easiEligibleSize} scope="colgroup" class="slds-text-align_center table-header table-header-middle">EaSi Eligible</th>
+                                <th colspan={easiIneligibleSize} scope="colgroup" class="slds-text-align_center table-header table-header-middle">EaSi Ineligible</th>
+                                <th colspan=2></th>   
+                            </tr>
+                        </thead>
+                    </table>
+
+                    <div class="button-div">
+                        <lightning-button variant="brand" label="Save" title="Save" onclick={handleSave} class="save-button"></lightning-button><br/>
+                    </div>
+                </template>        
+            </div>
+        </div>
+        
+      </lightning-card>
+</template>
