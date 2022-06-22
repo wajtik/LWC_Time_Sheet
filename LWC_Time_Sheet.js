@@ -1,9 +1,9 @@
 import { LightningElement, wire, track, api} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent'; 
-import getProjects from '@salesforce/apex/TimeSheetController.getActiveProjects';
-import getCurrentUser from '@salesforce/apex/TimeSheetController.getCurrentUser';
-import getTableRows from '@salesforce/apex/TimeSheetController.getTableRows';
-import saveChanges from '@salesforce/apex/TimeSheetController.saveChanges';
+import getProjects from '@salesforce/apex/Controller.getActiveProjects';
+import getCurrentUser from '@salesforce/apex/Controller.getCurrentUser';
+import getTableRows from '@salesforce/apex/Controller.getTableRows';
+import saveChanges from '@salesforce/apex/Controller.saveChanges';
 
 let monthList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];  
 
